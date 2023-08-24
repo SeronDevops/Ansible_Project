@@ -4,7 +4,10 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                // Fetch code from GitHub repository
+                checkout([$class: 'GitSCM',
+                          branches: [[name: '*/main']], // Change branch if needed
+                          userRemoteConfigs: [[url: 'https://github.com/SeronDevops/Ansible_Project.git']]])
             }
         }
         
