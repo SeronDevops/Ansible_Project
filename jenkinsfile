@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Deploy Nginx') {
+            steps {
+                sh 'ansible-playbook -i inventory.ini deploy_nginx.yml'
+            }
+        }
+        
+        stage('Provision MongoDB') {
+            steps {
+                sh 'ansible-playbook -i inventory.ini provision_mongodb.yml'
+            }
+        }
+        
+        // Additional stages here
+    }
+}

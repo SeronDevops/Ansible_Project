@@ -1,0 +1,22 @@
+---
+- name: Deploy Nginx
+  hosts: web_servers
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+    - name: Configure Nginx
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+    - name: Copy index.html
+      copy:
+        src: ../index.html
+        dest: /var/www/html/
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+

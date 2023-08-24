@@ -1,0 +1,27 @@
+---
+- name: Provision MongoDB
+  hosts: db_servers
+  become: yes
+
+  tasks:
+    - name: Add MongoDB repo key
+      apt_key:
+        url: https://www.mongodb.org/static/pgp/server-4.4.asc
+        state: present
+
+    - name: Add MongoDB repo
+      apt_repository:
+        repo: deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/4.4 multiverse
+        state: present
+
+    - name: Install MongoDB
+      apt:
+        name: mongodb-org
+        state: present
+
+    - name: Configure MongoDB
+      template:
+        src: mongod.conf.j2
+        dest: /etc/mongodb/mongod.conf
+      notify:
+        - include_tasks: handlers.yml
