@@ -1,28 +1,29 @@
 pipeline {
     agent any
 
+    environment {
+        ANSIBLE_SSH_ARGS = '-o StrictHostKeyChecking=no'
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Deploy Nginx and HTML') {
             steps {
-                // Fetch code from GitHub repository
-                checkout([$class: 'GitSCM',
-                          branches: [[name: '*/main']],
-                          userRemoteConfigs: [[url: 'https://github.com/SeronDevops/Ansible_Project.git']]])
+                script {
+                    def deployCmd = "ansible-playbook -i inventory.ini deploy_nginx.yml"
+                    
+                    withCredentials([sshUserPrivateKey(credentialsId: '1ac30ea4-d3be-4ed4-ab1a-f2526e6e54f6', keyFileVariable: 'SSH_KEY')]) {
+                        sh """
+                            echo "$SSH_KEY" > id_rsa
+                            chmod 600 id_rsa
+                            eval \$(ssh-agent -s)
+                            ssh-add id_rsa
+                            $deployCmd
+                        """
+                    }
+                }
             }
         }
         
-        stage('Deploy Nginx') {
-            steps {
-                sh 'ansible-playbook -i inventory.ini deploy_nginx.yml'
-            }
-        }
-        
-        stage('Provision MongoDB') {
-            steps {
-                sh 'ansible-playbook -i inventory.ini provision_mongodb.yml'
-            }
-        }
-        
-        // Additional stages here
+        // Other stages if needed
     }
 }
