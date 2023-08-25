@@ -6,7 +6,7 @@ pipeline {
             steps {
                 // Fetch code from GitHub repository
                 checkout([$class: 'GitSCM',
-                          branches: [[name: '*/main']], // Change branch if needed
+                          branches: [[name: '*/main']],
                           userRemoteConfigs: [[url: 'https://github.com/SeronDevops/Ansible_Project.git']]])
             }
         }
