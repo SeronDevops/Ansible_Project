@@ -1,22 +1,30 @@
 ---
-- name: Deploy Nginx
+- name: Deploy Nginx and HTML
   hosts: web_servers
+  become: yes
+
   tasks:
     - name: Install Nginx
       apt:
         name: nginx
         state: present
-    - name: Configure Nginx
-      template:
-        src: nginx.conf.j2
-        dest: /etc/nginx/nginx.conf
-    - name: Copy index.html
+
+    - name: Deploy HTML file
       copy:
-        src: ../index.html
-        dest: /var/www/html/
-  handlers:
-    - name: Restart Nginx
-      service:
+        src: index.html
+        dest: /var/www/html/index.html
+
+    - name: Start Nginx service
+      systemd:
         name: nginx
-        state: restarted
+        state: started
+
+    - name: Verify Nginx installation
+      command: systemctl is-active nginx
+      register: nginx_status
+
+    - name: Print Nginx status
+      debug:
+        var: nginx_status.stdout
+
 
